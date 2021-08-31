@@ -1,0 +1,78 @@
+﻿@model ChooseYourShoes.ViewModel.ProductFormViewModel
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>Product Details </h2>
+
+<hr />
+@using (Html.BeginForm("Edit", "Product", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(x => x.Products.Id)
+    @Html.HiddenFor(x => x.Products.Category)
+    @Html.HiddenFor(x => x.ActionButton)
+
+    <div class="box box-primary">
+        <div class="box-body">
+            @Html.ValidationSummary()
+            <div class="row">
+                <div class="col-md-6 form-horizontal">
+                    <div class="form-group">
+                        <label class="control-label input-sm col-sm-4">Product Id</label>
+                        <div class="col-sm-8">
+                            @Html.DisplayFor(x => x.Products.Id, new { @class = "form-control", @readonly ="readonly" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6 form-horizontal">
+                    <div class="form-group">
+                        <label class="control-label input-sm col-sm-4">Product Name</label>
+                        <div class="col-sm-8">
+                            @Html.DisplayFor(x => x.Products.ProductNm, new { @class = "form-control", @readonly = "readonly" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6 form-horizontal">
+                    <div class="form-group">
+                        <label class="control-label input-sm col-sm-4">Product Description</label>
+                        <div class="col-sm-8">
+                            @Html.DisplayFor(x => x.Products.ProductDesc, new { @class = "form-control", @readonly = "readonly" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6 form-horizontal">
+                    <div class="form-group">
+                        <label class="control-label input-sm col-sm-4">Product Category</label>
+                        <div class="col-sm-8">
+                            @Html.DisplayFor(x => x.Products.CategoryDesc ,new { @class = "form-control", @readonly = "readonly" }) 
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6 form-horizontal">
+                    <div class="form-group">
+                        <label class="control-label input-sm col-sm-4">Available Stocks</label>
+                        <div class="col-sm-8">
+                            @Html.DisplayFor(x => x.Products.StockAvailable, new { @class = "form-control", @readonly = "readonly" })
+                        </div>
+                    </div>
+                </div>
+            </div> 
+        </div>
+    </div>
+    <p>
+        @Html.ActionLink("Edit", "Edit", new {  id = Model.Products.Id }) |
+        @Html.ActionLink("Back to List", "Index")
+    </p>
+} 
+
+

@@ -1,0 +1,229 @@
+﻿@model ChooseYourShoes.ViewModel.OrderFormViewModel
+
+@{
+    ViewBag.Title = "Order Release";
+}
+
+<h2>Order Release</h2>
+
+
+@using (Html.BeginForm("ReleaseForm", "Order", FormMethod.Post, new { }))
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(x => x.ActionButton)
+    @Html.HiddenFor(x => x.ValidateStatus)
+    @Html.HiddenFor(x => x.ValidateStatusMsg)
+    @Html.HiddenFor(x => x.Orders.ReferenceId)
+
+    <div class="form-horizontal">
+        <hr />
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        <h3>Order Summary</h3>
+        <div class="row" style="display:none">
+            <div class="col-md-6 form-horizontal">
+                <div class="form-group">
+                    <label class="control-label input-sm col-sm-4">Requestor Id</label>
+                    <div class="col-sm-8">
+                        @Html.DisplayFor(model => model.Orders.RequestorId, new { @class = "form-control", @readonly = "readonly" })
+                        @Html.ValidationMessageFor(model => model.Orders.RequestorId, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6 form-horizontal">
+                <div class="form-group">
+                    <label class="control-label input-sm col-sm-4">Requestor Name</label>
+                    <div class="col-sm-8">
+                        @Html.DisplayFor(model => model.Orders.RequestorNm, new { @class = "form-control", @readonly = "readonly" })
+                        @Html.ValidationMessageFor(model => model.Orders.RequestorNm, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6 form-horizontal" id="divLocation">
+                <div class="form-group">
+                    <label class="control-label input-sm col-sm-4">Country</label>
+                    <div class="col-sm-8">
+                        @Html.DisplayFor(model => model.Orders.LocationDesc, new { @class = "form-control" })
+                        @*@Html.ValidationMessageFor(model => model.Orders.Location, "", new { @class = "text-danger" })*@
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6 form-horizontal" id="divActivityNm">
+                <div class="form-group">
+                    <label class="control-label input-sm col-sm-4">Activity Name</label>
+                    <div class="col-sm-8">
+                        @Html.DisplayFor(model => model.Orders.ActivityNm, new { @class = "form-control", @style = "height:100px;" })
+                        @Html.ValidationMessageFor(model => model.Orders.ActivityNm, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+            </div>
+        </div>
+        <hr />
+        <h3>Order Details</h3>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="table-holder">
+                    <table class="table table-bordered table-condensed" id="listOrderDetails">
+                        <thead>
+                            <tr>
+                                <th>Category</th>
+                                <th>Product Id</th>
+                                <th>Name</th>
+                                <th>Description</th>
+                                <th>Qty</th> 
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model.listOrderDetails.Count > 0)
+                            {
+                                for (int i = 0; i < Model.listOrderDetails.Count; i++)
+                                {
+                                    <tr>
+                                        <td>@Model.listOrderDetails[i].ProductCategoryDesc</td>
+                                        <td>@Model.listOrderDetails[i].ProductId</td>
+                                        <td>@Model.listOrderDetails[i].ProductNm</td>
+                                        <td>@Model.listOrderDetails[i].ProductDesc</td>
+                                        <td>@Model.listOrderDetails[i].Qty
+                                            @Html.HiddenFor(x => Model.listOrderDetails[i].Id)
+                                            @Html.HiddenFor(x => Model.listOrderDetails[i].ReferenceId)
+                                            @Html.HiddenFor(x => Model.listOrderDetails[i].ProductId)
+                                            @Html.HiddenFor(x => Model.listOrderDetails[i].ProductNm)
+                                            @Html.HiddenFor(x => Model.listOrderDetails[i].ProductDesc)
+                                            @Html.HiddenFor(x => Model.listOrderDetails[i].ProductCategory)
+                                            @Html.HiddenFor(x => Model.listOrderDetails[i].ProductCategoryDesc)
+                                            @Html.HiddenFor(x => Model.listOrderDetails[i].Qty)
+                                            @Html.HiddenFor(x => Model.listOrderDetails[i].CreateDttm)
+                                            @Html.HiddenFor(x => Model.listOrderDetails[i].CreateUser)
+                                            @Html.HiddenFor(x => Model.listOrderDetails[i].InputDttm)
+                                            @Html.HiddenFor(x => Model.listOrderDetails[i].InputUser) 
+
+
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="5">No items to display.</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+         
+        <br />
+        <hr>
+        <div class="row">
+            <div class="col-md-12 form-horizontal">
+                <div class="form-group">
+                    <div style="display:none;">
+                        <button type="submit" id="btnSubmitForm"></button>
+                    </div>
+                    <div class="col-sm-12">
+                        <button id="btnCancel" type="button" class="btn btn-primary button-margin btn-sm pull-right" style="margin-right: 10px; width:150px;">Cancel</button>
+                        <button id="btnSubmit" type="button" class="btn btn-primary button-margin btn-sm pull-right" style="margin-right: 10px; width:150px;">Release</button>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+} 
+<div>
+    @Html.ActionLink("Back to List", "Index")
+</div>
+<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script type="text/javascript">
+    var $row;
+    var rowIndex;
+
+    @*//On-Load
+    $(document).ready(function () {
+        if ('@ViewBag.Status' == "1") {
+            toastr.success('@ViewBag.Message');
+            setTimeout(
+            function () {
+                window.location.href = '@Url.Action("Index", "Order", new {  })';
+            }, 5000);
+        }
+        if ('@ViewBag.Status' == "0") {
+            toastr.error('@ViewBag.Message');
+        }
+    });*@
+
+    //On Submit
+    $('#btnSubmit').click(function () {
+        bootbox.confirm("Are you sure you want to release ?", function (result) {
+            if (result) {
+                //ajax method for releasing order
+                $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("ReleaseOrder", "Order", new { area = "" })',
+                    data: JSON.stringify({ param1: $('#Orders_ReferenceId').val(), param2: "Released" }),
+                    dataType: "json",
+                    contentType: "application/json; charset=utf-8",
+                    success: function (data) {
+                        if (data.Code == "1") {
+                            toastr.success(data.Message);
+                            setTimeout(
+                            function () {
+                                window.location.href = '@Url.Action("Index", "Order", new {  })';
+                            }, 4000);
+                        }
+                        else {
+                            toastr.error(data.Message);
+                        }
+                    }
+                });
+            }
+        });
+    })
+
+    $('#btnCancel').click(function () {
+        bootbox.confirm("Are you sure you want to release ?", function (result) {
+            if (result) {
+                //ajax method for cancelling order
+                $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("ReleaseOrder", "Order", new { area = "" })',
+                    data: JSON.stringify({ param1: $('#Orders_ReferenceId').val(), param2: "Cancelled" }),
+                    dataType: "json",
+                    contentType: "application/json; charset=utf-8",
+                    success: function (data) {
+                        if (data.Code == "1") {
+                            toastr.success(data.Message);
+                            setTimeout(
+                            function () {
+                                window.location.href = '@Url.Action("Index", "Order", new {  })';
+                            }, 4000);
+                        }
+                        else { 
+                            toastr.error(data.Message);
+                        }
+                    }
+                });
+            }
+        });
+    })
+
+</script>
+<style> 
+
+    @@media (min-width: 768px) {
+        .form-horizontal .control-label {
+            text-align: left;
+        }
+    }
+</style>

@@ -1,0 +1,656 @@
+﻿@model ChooseYourShoes.ViewModel.OrderFormViewModel
+
+@{
+    ViewBag.Title = "Update Order Form";
+}
+
+<h2>Order Request</h2>
+
+
+@using (Html.BeginForm("Details", "Order", FormMethod.Post, new { }))
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(x => x.ActionButton)
+    @Html.HiddenFor(x => x.ValidateStatus)
+    @Html.HiddenFor(x => x.ValidateStatusMsg)
+
+    <div class="form-horizontal">
+        <hr />
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        <h3>Order Summary</h3>
+        <br/>
+        <div class="row" style="display:none">
+            <div class="col-md-6 form-horizontal">
+                <div class="form-group">
+                    <label class="control-label input-sm col-sm-4">Requestor Id</label>
+                    <div class="col-sm-8">
+                        @Html.DisplayFor(model => model.Orders.RequestorId, new { @class = "form-control", @readonly = "readonly" })
+                        @Html.ValidationMessageFor(model => model.Orders.RequestorId, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6 form-horizontal">
+                <div class="form-group">
+                    <label class="control-label input-sm col-sm-4">Requestor Name</label>
+                    <div class="col-sm-8">
+                        @Html.DisplayFor(model => model.Orders.RequestorNm, new { @class = "form-control", @readonly = "readonly" }) 
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6 form-horizontal" id="divLocation">
+                <div class="form-group">
+                    <label class="control-label input-sm col-sm-4">Country</label>
+                    <div class="col-sm-8">
+                        @Html.DisplayFor(model => model.Orders.LocationDesc, new { @class = "form-control", @readonly = "readonly" }) 
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6 form-horizontal" id="divActivityNm">
+                <div class="form-group">
+                    <label class="control-label input-sm col-sm-4">Activity Name</label>
+                    <div class="col-sm-8">
+                        @Html.DisplayFor(model => model.Orders.ActivityNm, new { @class = "form-control", @style = "height:100px;", @readonly = "readonly" })
+                        @Html.ValidationMessageFor(model => model.Orders.ActivityNm, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+            </div>
+        </div>
+        <hr />
+        <h3>Order Details</h3>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="table-holder">
+                    <table class="table table-bordered table-condensed" id="listOrderDetails">
+                        <thead>
+                            <tr>
+                                <th>Category</th>
+                                <th>Product Id</th>
+                                <th>Name</th>
+                                <th>Description</th>
+                                <th>Qty</th>      
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model.listOrderDetails.Count > 0)
+                            {
+                                for (int i = 0; i < Model.listOrderDetails.Count; i++)
+                                {
+                                    <tr>
+                                        <td>@Model.listOrderDetails[i].ProductCategoryDesc</td>
+                                        <td>@Model.listOrderDetails[i].ProductId</td>
+                                        <td>@Model.listOrderDetails[i].ProductNm</td>
+                                        <td>@Model.listOrderDetails[i].ProductDesc</td>
+                                        <td>@Model.listOrderDetails[i].Qty 
+                                            @Html.HiddenFor(x => Model.listOrderDetails[i].Id)
+                                            @Html.HiddenFor(x => Model.listOrderDetails[i].ReferenceId)
+                                            @Html.HiddenFor(x => Model.listOrderDetails[i].ProductId)
+                                            @Html.HiddenFor(x => Model.listOrderDetails[i].ProductNm)
+                                            @Html.HiddenFor(x => Model.listOrderDetails[i].ProductDesc)
+                                            @Html.HiddenFor(x => Model.listOrderDetails[i].ProductCategory)
+                                            @Html.HiddenFor(x => Model.listOrderDetails[i].ProductCategoryDesc)
+                                            @Html.HiddenFor(x => Model.listOrderDetails[i].Qty)
+                                            @Html.HiddenFor(x => Model.listOrderDetails[i].CreateDttm)
+                                            @Html.HiddenFor(x => Model.listOrderDetails[i].CreateUser)
+                                            @Html.HiddenFor(x => Model.listOrderDetails[i].InputDttm)
+                                            @Html.HiddenFor(x => Model.listOrderDetails[i].InputUser)
+                                              
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="5">No items to display.</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div> 
+        <br />
+        <hr>
+        <div class="row">
+            <div class="col-md-12 form-horizontal">
+                <div class="form-group">
+                    <div style="display:none;">
+                        <button type="submit" id="btnSubmitForm"></button>
+                    </div>
+                    <div class="col-sm-12">
+                        <button id="btnExit" type="button" class="btn btn-primary button-margin btn-sm pull-right" style="margin-right: 10px; width:150px;">Exit</button>
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+}
+<div class="modal modal-default fade" id="modal-order-details" style="padding-left:20%;padding-right:20%">
+    <div class="modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div id="divHeaderLiq">
+                    <h4 class="modal-title">
+                        Order Details
+                    </h4>
+                </div>
+
+            </div>
+            <div class="modal-body">
+                <div class="box box-primary">
+                    <div class="box-body">
+                        <div class="row" id="divOrderDetails">
+                            <div class="col-md-12 form-horizontal">
+                                <div class="form-group" id="divmodal_search_productId">
+                                    <label class="control-label input-sm col-sm-4">Product Id<span class="text-red">*</span></label>
+                                    <div class="col-sm-8">
+                                        <input class="form-control input-sm" id="modal_search_productId" type="text" placeholder="CYS-XXXX-XXXXXX">
+                                    </div>
+                                </div>
+                                <div class="form-group" id="divmodal_order_qty">
+                                    <label class="control-label input-sm col-sm-4">Quantity<span class="text-red">*</span></label>
+                                    <div class="col-sm-8">
+                                        <input type="number" class="form-control input-sm" id="modal_order_qty" />
+                                    </div>
+                                </div>
+                                @Html.HiddenFor(x => x.modalOrdersDetails.ProductId)
+                                @Html.HiddenFor(x => x.modalOrdersDetails.ProductNm)
+                                @Html.HiddenFor(x => x.modalOrdersDetails.ProductDesc)
+                                @Html.HiddenFor(x => x.modalOrdersDetails.ProductCategory)
+                                @Html.HiddenFor(x => x.modalOrdersDetails.ProductCategoryDesc)
+                                @Html.HiddenFor(x => x.modalOrdersDetails.ReferenceId)
+                                @Html.HiddenFor(x => x.modalOrdersDetails.Id)
+
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default btn-sm pull-left btnModalCloseDetails" data-dismiss="modal" style="width: 120px">Close</button>
+                        <button class="btn btn-info btn-sm" type="button" id="btnModalAddDetails" style="width: 120px">Add Product</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div>
+    @Html.ActionLink("Back to List", "Index")
+</div>
+<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script type="text/javascript">
+    var $row;
+    var rowIndex;
+
+    function ValidateRequest() {
+        var isValid = true;
+        var invFields = "";
+        var msg = "";
+
+        if ($('#modalOrdersDetails_Id').val() == "") {
+            $("#divmodal_search_productId").addClass("form-group has-error");
+            invFields = invFields + "<p>Product is required.</p>";
+            isValid = false;
+        }
+        else {
+            $("#divmodal_search_productId").removeClass("has-error");
+        }
+
+        if ($('#modal_order_qty').val() == "" || $('#modal_order_qty').val() == "0") {
+            $("#divmodal_order_qty").addClass("form-group has-error");
+            invFields = invFields + "<p>Quantity is required.</p>";
+            isValid = false;
+        }
+
+        if ($('#ValidateStatus').val() == "0" || $('#ValidateStatus').val() == null || $('#ValidateStatus').val() == "") {
+            $("#divmodal_order_qty").addClass("form-group has-error");
+            invFields = invFields + "<p>" + $('#ValidateStatusMsg').val() + "</p>";
+            isValid = false;
+        }
+        else {
+            $("#divmodal_order_qty").removeClass("has-error");
+        }
+
+
+        if (!isValid) {
+            toastr.error('Please validate the errors below: <br><br>' + invFields);
+        }
+        else {
+        }
+
+        return isValid;
+    }
+    $('#modal_order_qty').change(function () {
+        CheckStockAvailable();
+    });
+
+    function CheckStockAvailable() {
+        var ProductNo = $('#modalOrdersDetails_Id').val()
+        var Qty = $('#modal_order_qty').val()
+        var Result = '';
+
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("CheckStockAvailable", "Order", new { area = "" })',
+            data: JSON.stringify({ param1: ProductNo , param2: Qty }),
+            dataType: "json",
+            contentType: "application/json; charset=utf-8",
+            success: function (data) {
+                $('#ValidateStatus').val(data.CodeTxt);
+                $('#ValidateStatusMsg').val(data.DecodeTxt);
+
+            }
+        });
+
+    }
+
+    //Populate Product Details from Modal
+    $("#modal_search_productId").autocomplete({
+        source: function (request, response) {
+            $.ajax({
+                url: '@Url.Action("GetProductList", "Order", new { area = "" })',
+                type: "POST",
+                dataType: "json",
+                data: { Prefix: request.term },
+                success: function (data) {
+                    response($.map(data, function (item) {
+                        return { label: item.DecodeTxt, value: item.CodeTxt };
+                    }))
+                }
+            })
+        },
+        minLength: 3
+    });
+    $('#modal_search_productId').change(function () {
+        var prefix = $('#modal_search_productId').val()
+        GetProductDetails(prefix);
+    });
+    function GetProductDetails(prefix) {
+        if ($('#modal_search_productId').val() != "" || $('#modal_search_productId').val() != null) {
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("GetProductDetails", "Order", new { area = "" })',
+                data: JSON.stringify({ Prefix: prefix }),
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                success: function (data) {
+                    $('#modalOrdersDetails_ReferenceId').val(data.ReferenceId);
+                    $('#modalOrdersDetails_Id').val(data.Id);
+                    $('#modalOrdersDetails_ProductId').val(data.ProductId);
+                    $('#modalOrdersDetails_ProductNm').val(data.ProductNm);
+                    $('#modalOrdersDetails_ProductDesc').val(data.ProductDesc);
+                    $('#modalOrdersDetails_ProductCategory').val(data.ProductCategory);
+                    $('#modalOrdersDetails_ProductCategoryDesc').val(data.ProductCategoryDesc);
+
+                }
+            });
+        }
+        else {
+            $('#modalOrdersDetails_ReferenceId').val('');
+            $('#modalOrdersDetails_Id').val('');
+            $('#modalOrdersDetails_ProductId').val('');
+            $('#modalOrdersDetails_ProductNm').val('');
+            $('#modalOrdersDetails_ProductDesc').val('');
+            $('#modalOrdersDetails_ProductCategory').val('');
+            $('#modalOrdersDetails_ProductCategoryDesc').val('');
+        }
+    }
+
+    //On-Load
+    $(document).ready(function () {
+        if ('@ViewBag.Status' == "1") {
+            toastr.success('@ViewBag.Message');
+            setTimeout(
+            function () {
+                window.location.href = '@Url.Action("Index", "Order", new {  })';
+            }, 10000);
+        }
+        if ('@ViewBag.Status' == "0") {
+            toastr.error('@ViewBag.Message');
+        }
+
+    });
+    function ValidateForm() {
+        var Location = $('#Orders_Location').val()
+        var ActivityNm = $('#Orders_ActivityNm').val()
+        var isValid = true;
+        var invFields = "";
+        var msg = "";
+
+        if (Location == "") {
+            $("#divLocation").addClass("form-group has-error");
+            invFields = invFields + "<p>Country is required.</p>";
+            isValid = false;
+        }
+        else {
+            $("#divLocation").removeClass("has-error");
+        }
+        if (ActivityNm == "") {
+            $("#divActivityNm").addClass("form-group has-error");
+            invFields = invFields + "<p>Activity Name is required.</p>";
+            isValid = false;
+        }
+        else {
+            $("#divActivityNm").removeClass("has-error");
+        }
+        if ($('#listOrderDetails > tbody > tr > td').html() == 'No items to display.') {
+            $("#listOrderDetails").addClass("has-error");
+            invFields = invFields + "<p>Order Details is required.</p>";
+            isValid = false;
+        }
+        else {
+            $("#listOrderDetails").removeClass("has-error");
+        }
+
+        if (!isValid) {
+            toastr.error('Please validate the errors below: <br><br>' + invFields);
+        }
+        else {
+        }
+
+        return isValid;
+    }
+
+    //On Submit
+    $('#btnSubmit').click(function () {
+        bootbox.confirm("Are you sure you want to submit?", function (result) {
+            if (result) {
+                if (!ValidateForm()) {
+                    return false;
+                }
+                else {
+                    $('#ActionButton').val('Create')
+                    $('#btnSubmitForm').click();
+                }
+            }
+        });
+    })
+
+    function ClearModalVal() {
+        $('#modalOrdersDetails_ProductId').val('');
+        $('#modalOrdersDetails_ProductNm').val('');
+        $('#modalOrdersDetails_ProductDesc').val('');
+        $('#modalOrdersDetails_ProductCategory').val('');
+        $('#modalOrdersDetails_ProductCategoryDesc').val('');
+        $('#modalOrdersDetails_ReferenceId').val('');
+        $('#modalOrdersDetails_Id').val('');
+        $('#modal_search_productId').val('');
+        $('#modal_order_qty').val('');
+    }
+
+    $('.btnModalCloseDetails').click(function () {
+        ClearModalVal();
+    })
+    ///CRUD for Order Details Modal
+    $('#btnModalAddDetails').click(function () {
+        bootbox.confirm("Are you sure you want to add this item?", function (result) {
+            CheckStockAvailable();
+            if (result) {
+
+                if (!ValidateRequest()) {
+                    return false;
+                }
+
+                if (ValidateRequest()) {
+                    var ProductId = $('#modalOrdersDetails_ProductId').val();
+                    var ProductNm = $('#modalOrdersDetails_ProductNm').val();
+                    var ProductDesc = $('#modalOrdersDetails_ProductDesc').val();
+                    var ProductCategory = $('#modalOrdersDetails_ProductCategory').val();
+                    var ProductCategoryDesc = $('#modalOrdersDetails_ProductCategoryDesc').val();
+                    var ReferenceId = $('#modalOrdersDetails_ReferenceId').val();
+                    var Id = $('#modalOrdersDetails_Id').val();
+                    var Qty = $('#modal_order_qty').val();
+
+                    if ($row == null) {
+                        if ($('#listOrderDetails > tbody > tr > td').html() == 'No items to display.') {
+                            $('#listOrderDetails > tbody').html('');
+                        }
+
+                        var tblBody = document.getElementById('listOrderDetails').getElementsByTagName('tbody')[0];
+                        var rowCount = tblBody.rows.length;
+                        var trDetails = document.createElement('tr');
+
+                        var textnodeProductId = document.createTextNode(ProductId);
+                        var tdProductId = document.createElement('td');
+                        tdProductId.appendChild(textnodeProductId);
+
+                        var textnodeProductNm = document.createTextNode(ProductNm);
+                        var tdProductNm = document.createElement('td');
+                        tdProductNm.appendChild(textnodeProductNm);
+
+                        var textnodeProductDesc = document.createTextNode(ProductDesc);
+                        var tdProductDesc = document.createElement('td');
+                        tdProductDesc.appendChild(textnodeProductDesc);
+
+                        var textnodeProductCategory = document.createTextNode(ProductCategory);
+                        var tdProductCategory = document.createElement('td');
+                        tdProductCategory.appendChild(textnodeProductCategory);
+
+                        var textnodeProductCategoryDesc = document.createTextNode(ProductCategoryDesc);
+                        var tdProductCategoryDesc = document.createElement('td');
+                        tdProductCategoryDesc.appendChild(textnodeProductCategoryDesc);
+
+                        var textnodeReferenceId = document.createTextNode(ReferenceId);
+                        var tdReferenceId = document.createElement('td');
+                        tdReferenceId.appendChild(textnodeReferenceId);
+
+                        var textnodeId = document.createTextNode(Id);
+                        var tdId = document.createElement('td');
+                        tdId.appendChild(textnodeId);
+
+                        var textnodeQty = document.createTextNode(Qty);
+                        var tdQty = document.createElement('td');
+                        tdQty.appendChild(textnodeQty);
+
+                        var tdActions = document.createElement('td');
+                        tdActions.style.display = "flex";
+
+                        $('<input>').attr({
+                            type: 'hidden', id: 'listOrderDetails_' + rowCount + '__ProductId', name: 'listOrderDetails[' + rowCount + '].ProductId',
+                            value: ProductId
+                        }).appendTo(tdActions);
+
+                        $('<input>').attr({
+                            type: 'hidden', id: 'listOrderDetails_' + rowCount + '__ProductNm', name: 'listOrderDetails[' + rowCount + '].ProductNm',
+                            value: ProductNm
+                        }).appendTo(tdActions);
+
+                        $('<input>').attr({
+                            type: 'hidden', id: 'listOrderDetails_' + rowCount + '__ProductDesc', name: 'listOrderDetails[' + rowCount + '].ProductDesc',
+                            value: ProductDesc
+                        }).appendTo(tdActions);
+
+                        $('<input>').attr({
+                            type: 'hidden', id: 'listOrderDetails_' + rowCount + '__ProductCategory', name: 'listOrderDetails[' + rowCount + '].ProductCategory',
+                            value: ProductCategory
+                        }).appendTo(tdActions);
+
+                        $('<input>').attr({
+                            type: 'hidden', id: 'listOrderDetails_' + rowCount + '__ProductCategoryDesc', name: 'listOrderDetails[' + rowCount + '].ProductCategoryDesc',
+                            value: ProductCategoryDesc
+                        }).appendTo(tdActions);
+
+                        $('<input>').attr({
+                            type: 'hidden', id: 'listOrderDetails_' + rowCount + '__ReferenceId', name: 'listOrderDetails[' + rowCount + '].ReferenceId',
+                            value: ReferenceId
+                        }).appendTo(tdActions);
+
+                        $('<input>').attr({
+                            type: 'hidden', id: 'listOrderDetails_' + rowCount + '__Id', name: 'listOrderDetails[' + rowCount + '].Id',
+                            value: Id
+                        }).appendTo(tdActions);
+
+                        $('<input>').attr({
+                            type: 'hidden', id: 'listOrderDetails_' + rowCount + '__Qty', name: 'listOrderDetails[' + rowCount + '].Qty',
+                            value: Qty
+                        }).appendTo(tdActions);
+
+                        htmlActions = '<button class="btn btn-sm btn-primary btn-sm btnEditDetails" style="margin-right:10px;" type="button">Edit</button>' +
+                                    '<button class="btn btn-sm btn-danger btn-sm btnRemoveDetails" style="margin-right:10px;" type="button">Remove</button>'
+
+                        tdActions.insertAdjacentHTML('beforeend', htmlActions);
+
+
+                        trDetails.appendChild(tdProductCategoryDesc);
+                        trDetails.appendChild(tdProductId);
+                        trDetails.appendChild(tdProductNm);
+                        trDetails.appendChild(tdProductDesc);
+                        trDetails.appendChild(tdQty);
+                        trDetails.appendChild(tdActions);
+                        tblBody.appendChild(trDetails);
+                    }
+                    else {
+                        $row.find('input[name$=Id]').val(Id);
+                        $row.find('input[name$=ReferenceId]').val(ReferenceId);
+                        $row.find('input[name$=ProductId]').val(ProductId);
+                        $row.find('input[name$=ProductNm]').val(ProductNm);
+                        $row.find('input[name$=ProductDesc]').val(ProductDesc);
+                        $row.find('input[name$=ProductCategory]').val(ProductCategory);
+                        $row.find('input[name$=ProductCategoryDesc]').val(ProductCategoryDesc);
+                        $row.find('input[name$=Qty]').val(Qty);
+
+
+                        $row.find('td:nth-child(1)').html(ProductCategoryDesc);
+                        $row.find('td:nth-child(2)').html(ProductId);
+                        $row.find('td:nth-child(3)').html(ProductNm);
+                        $row.find('td:nth-child(4)').html(ProductDesc);
+                        $row.find('td:nth-child(5)').html(Qty);
+                    }
+
+                    $('#modal-order-details').modal('hide');
+
+                    ClearModalVal();
+
+                    $("#divmodal_order_qty").removeClass("has-error");
+                    $("#divmodal_search_productId").removeClass("has-error");
+                }
+            }
+        });
+    });
+
+    $('#btnAddLine').click(function () {
+        $row = null;
+        rowIndex = null;
+
+        $('#btnModalAddDetails').html('Add Product');
+        $("#divmodal_order_qty").addClass("form-group");
+        $("#divmodal_search_productId").addClass("form-group");
+    });
+    $(document).on('click', '.btnEditDetails', function () {
+        $row = $(this).closest("tr");
+        rowIndex = $row.index();
+        $('#btnModalAddDetails').html(' Update Product');
+
+
+        $('#modalOrdersDetails_Id').val($('#listOrderDetails_'+ rowIndex +'__Id').val());
+        $('#modalOrdersDetails_ProductId').val($row.find('input[name$=ProductId]').val());
+        $('#modalOrdersDetails_ProductNm').val($row.find('input[name$=ProductNm]').val());
+        $('#modalOrdersDetails_ProductDesc').val($row.find('input[name$=ProductDesc]').val());
+        $('#modalOrdersDetails_ProductCategory').val($row.find('input[name$=ProductCategory]').val());
+        $('#modalOrdersDetails_ProductCategoryDesc').val($row.find('input[name$=ProductCategoryDesc]').val());
+        $('#modalOrdersDetails_ReferenceId').val($row.find('input[name$=ReferenceId]').val());
+        $('#modal_search_productId').val($row.find('td:nth-child(1)').html());
+        $('#modal_order_qty').val($row.find('td:nth-child(5)').html());
+
+        $('#modal-order-details').modal('show');
+
+    });
+    $(document).on('click', '.btnRemoveDetails', function () {
+        $row = $(this).closest("tr");
+
+        $(this).closest("tr").remove();
+        $row = null;
+        var $remRow;
+
+        var tblBody = document.getElementById('listOrderDetails').getElementsByTagName('tbody')[0];
+        var rowCount = tblBody.rows.length;
+
+        if (rowCount == 0) {
+            $('#listOrderDetails > tbody').html('<tr><td colspan="5">No items to display.</td></tr>');
+        }
+
+        $('#listOrderDetails > tbody > tr').each(function () {
+            var ind = $(this).index();
+            $remRow = $(this);
+
+            $remRow.find('input[name$=ProductId]').attr('id', 'listOrderDetails_' + ind + '__ProductId')
+                .attr('name', 'listOrderDetails[' + ind + '].ProductId');
+
+            $remRow.find('input[name$=ProductNm]').attr('id', 'listOrderDetails_' + ind + '__ProductNm')
+                .attr('name', 'listOrderDetails[' + ind + '].ProductNm');
+
+            $remRow.find('input[name$=ProductDesc]').attr('id', 'listOrderDetails_' + ind + '__ProductDesc')
+                .attr('name', 'listOrderDetails[' + ind + '].ProductDesc');
+
+            $remRow.find('input[name$=ProductCategory]').attr('id', 'listOrderDetails_' + ind + '__ProductCategory')
+                .attr('name', 'listOrderDetails[' + ind + '].ProductCategory');
+
+            $remRow.find('input[name$=ProductCategoryDesc]').attr('id', 'listOrderDetails_' + ind + '__ProductCategoryDesc')
+                .attr('name', 'listOrderDetails[' + ind + '].ProductCategoryDesc');
+
+            $remRow.find('input[name$=ReferenceId]').attr('id', 'listOrderDetails_' + ind + '__ReferenceId')
+                .attr('name', 'listOrderDetails[' + ind + '].ReferenceId');
+
+            $remRow.find('input[name$=Id]').attr('id', 'listOrderDetails_' + ind + '__Id')
+                .attr('name', 'listOrderDetails[' + ind + '].Id');
+
+            $remRow.find('input[name$=Qty]').attr('id', 'listOrderDetails_' + ind + '__Qty')
+                .attr('name', 'listOrderDetails[' + ind + '].Qty');
+        });
+
+    });
+</script>
+<style>
+    .column {
+        float: left;
+    }
+
+    .left {
+        width: 65%;
+    }
+
+    .middle {
+        width: 20%;
+    }
+
+    .right {
+        width: 15%;
+    }
+
+    .row:after {
+        content: "";
+        display: table;
+        clear: both;
+    }
+
+    ul.ui-autocomplete.ui-menu {
+        z-index: 1000;
+    }
+
+    .ui-autocomplete {
+        position: absolute;
+        cursor: default;
+        z-index: 4000 !important;
+    }
+
+    .table-holder {
+        overflow-x: auto;
+    }
+
+    @@media (min-width: 768px) {
+        .form-horizontal .control-label {
+            text-align: left;
+        }
+    }
+</style>
